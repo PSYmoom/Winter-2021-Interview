@@ -30,19 +30,18 @@ export class Pokemon {
       return null;
     }
 
-    let nameList = names[0].split(",")
+    let nameList = names[0].split(',')
     let data= [];
 
-    nameList.forEach(element => {
+    nameList.forEach(async element => {
       try {
-        let temp = this.getPokemonByName(element)
-        let pokemon = {
-          {id: temp.id,
+        let temp = await this.getPokemonByName(element);
+        let pokemon: IPokemon = {
+          id: temp.id,
           weight: temp.weight,
           height: temp.height,
           moves: temp.moves
-          }
-        }
+        };
         data.push(pokemon);
       } catch (err) {
         throw new Error('Name Invalid');
