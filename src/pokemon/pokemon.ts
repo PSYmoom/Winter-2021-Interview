@@ -26,8 +26,31 @@ export class Pokemon {
    * @param names list of names
    */
   public async getPokemonsByNameList(names: string[]): Promise<IPokemon[]> {
-    // TO BE IMPLEMENTED
-    return null;
+    if (names == null) {
+      return null;
+    }
+
+    let nameList = names[0].split(",")
+    let data= [];
+
+    nameList.forEach(element => {
+      try {
+        let temp = this.getPokemonByName(element)
+        let pokemon = {
+          {id: temp.id,
+          weight: temp.weight,
+          height: temp.height,
+          moves: temp.moves
+          }
+        }
+        data.push(pokemon);
+      } catch (err) {
+        throw new Error('Name Invalid');
+      }
+    });
+
+    const json: IPokemon = await data.json();
+    return json;
   }
 
   /**
