@@ -1,12 +1,12 @@
 import express from 'express';
-import { Pokemon } from './pokemon/pokemon';
+import { Pokemon, IReturnObject } from './pokemon/pokemon';
 
 const app = express();
 app.use(express.json());
 const port = 8001; // default port to listen
 
 // define a route handler for the default home page
-app.get('/', async (request: any, response: any) => {
+app.get('/', async (_request: any, response: any) => {
   response.send({});
 });
 
@@ -15,11 +15,19 @@ app.get('/pokemon', async (request, response) => {
   const p = new Pokemon();
   // Sends in the requested name
   try {
-    const result = await p.getPokemonByName(String(request.query.name));
-    // Sends back the id of the pokemon
-    response.send({
+    const pokemonNameList: string[] = String(request.query.name).split(',');
+    const result = await p.getPokemonsByNameList(pokemonNameList);
+
+    let returnObject: IReturnObject = {
       data: result
-    });
+    }
+
+    if (pokemonNameList.length != result.length) {
+      returnObject.error = "Some pokemon names were invalid";
+    }
+
+    // Sends back the id of the pokemon
+    response.send(returnObject);
   } catch (e) {
     console.log(e);
     response.status(500);

@@ -11,11 +11,18 @@ export interface IResponse {
   id: number;
   weight: number;
   height: number;
-  moves: {
-    move: {
-      name: string;
-    };
-  };
+  moves: IMoveObject[];
+}
+
+export interface IMoveObject {
+  move: {
+    name: string;
+  }
+}
+
+export interface IReturnObject {
+  data: IPokemon[];
+  error?: string;
 }
 
 export class Pokemon {
@@ -25,32 +32,35 @@ export class Pokemon {
    * Gets the list of Pokemon info objects
    * @param names list of names
    */
-  public async getPokemonsByNameList(names: string[]): Promise<IPokemon[]> {
+   public async getPokemonsByNameList(names: string[]): Promise<IPokemon[]> {
     if (names == null) {
       return null;
     }
 
-    let nameList = names[0].split(',')
-    let data= [];
+    let data: IPokemon[] = [];
 
-    nameList.forEach(async element => {
+    for (const name of names) {
       try {
-        let temp = await this.getPokemonByName(element);
+        let response: IResponse = await this.getPokemonByName(name.toLowerCase());
         let pokemon: IPokemon = {
-          id: temp.id,
-          weight: temp.weight,
-          height: temp.height,
-          moves: temp.moves
+          id: response.id,
+          weight: response.weight,
+          height: response.height,
+          moves: []
         };
-        data.push(pokemon);
-      } catch (err) {
-        throw new Error('Name Invalid');
-      }
-    });
 
-    const json: IPokemon = await data.json();
-    return json;
-  }
+        for (let moveObject of response.moves) {
+          pokemon.moves.push(moveObject.move.name);
+        }
+
+        data.push(pokemon);
+      } catch(e) {
+        // Do nothing
+      }
+    }
+
+    return data;
+   }
 
   /**
    * Gets a Pokemon info object
